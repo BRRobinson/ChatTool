@@ -19,5 +19,5 @@ public interface IMessageManager
 
     public Task<ReturnResult<Message>> Update(Message message);
 
-    public Task<ReturnResult<Message>> Delete(int id);
+    public Task<ReturnResult> Delete(int id);
 }

@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using ChatTool.API.Interfaces;
+﻿using ChatTool.API.Interfaces;
 using ChatTool.API.Models;
 using ChatTool.Database;
 using ChatTool.Database.Models;

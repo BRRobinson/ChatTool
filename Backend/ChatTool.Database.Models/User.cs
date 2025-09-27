@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace ChatTool.Database.Models
@@ -19,6 +18,6 @@ namespace ChatTool.Database.Models
         public List<Chat> Chats { get; set; } = new List<Chat>();
 
         [JsonIgnore]
-        public List<Message> messages{ get; set; } = new List<Message>();
+        public List<Message> messages { get; set; } = new List<Message>();
     }
 }

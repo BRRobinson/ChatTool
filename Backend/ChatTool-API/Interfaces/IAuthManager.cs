@@ -1,5 +1,4 @@
 ﻿using ChatTool.API.Models;
-using ChatTool.Database.Models;
 
 namespace ChatTool.API.Interfaces
 {

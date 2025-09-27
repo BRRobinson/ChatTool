@@ -17,5 +17,5 @@ public interface IChatManager
 
     public Task<ReturnResult<Chat>> Update(Chat chat);
 
-    public Task<ReturnResult<Chat>> Delete(int id);
+    public Task<ReturnResult> Delete(int id);
 }

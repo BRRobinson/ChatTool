@@ -15,5 +15,5 @@ public interface IUserManager
 
     public Task<ReturnResult<User>> Update(User user);
 
-    public Task<ReturnResult<User>> Delete(int id);
+    public Task<ReturnResult> Delete(int id);
 }

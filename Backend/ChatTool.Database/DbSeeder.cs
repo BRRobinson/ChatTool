@@ -1,10 +1,4 @@
-﻿using BCrypt.Net;
-using ChatTool.Database.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ChatTool.Database.Models;
 
 namespace ChatTool.Database;
 

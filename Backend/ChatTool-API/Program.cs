@@ -2,7 +2,6 @@ using ChatTool.API.Extensions;
 using ChatTool.Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);

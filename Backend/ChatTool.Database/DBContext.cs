@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ChatTool.Database;
-using ChatTool.Database.Models;
+﻿using ChatTool.Database.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChatTool.Database;
 
@@ -9,8 +8,8 @@ public class DBContext : DbContext
     public DBContext(DbContextOptions<DBContext> options) : base(options) { }
 
     public DbSet<User> Users { get; set; }
-    public DbSet<Chat> Chats{ get; set; }
-    public DbSet<Message> Messages{ get; set; }
+    public DbSet<Chat> Chats { get; set; }
+    public DbSet<Message> Messages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -28,8 +27,11 @@ public class DBContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Chat>()
+            .Ignore(c => c.Messages);
+
+        modelBuilder.Entity<Chat>()
             .HasMany(c => c.Participants)
-            .WithMany();
+            .WithMany(u => u.Chats);
 
         modelBuilder.Entity<Message>()
             .HasOne(m => m.Sender)

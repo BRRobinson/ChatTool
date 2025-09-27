@@ -1,5 +1,4 @@
 using ChatTool.API.Interfaces;
-using ChatTool.API.Managers;
 using ChatTool.API.Models;
 using ChatTool.Database.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -30,10 +29,11 @@ public class ChatsController : ControllerBase
             if (chatsResult.IsSuccess)
                 return Ok(chatsResult);
 
-            return Unauthorized(chatsResult);
+            return BadRequest(chatsResult);
         }
         catch (Exception e)
         {
+            _logger.LogError(e, e.Message);
             return StatusCode(500, ReturnResult<List<Chat>>.Failed());
         }
     }
@@ -47,11 +47,66 @@ public class ChatsController : ControllerBase
             if (chatsResult.IsSuccess)
                 return Ok(chatsResult);
 
-            return Unauthorized(chatsResult);
+            return BadRequest(chatsResult);
         }
         catch (Exception e)
         {
+            _logger.LogError(e, e.Message);
             return StatusCode(500, ReturnResult<Chat>.Failed());
+        }
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<ReturnResult<Chat>>> CreateChat([FromBody] Chat chat)
+    {
+        try
+        {
+            var chatsResult = await _chatManager.Insert(chat);
+            if (chatsResult.IsSuccess)
+                return Ok(chatsResult);
+
+            return BadRequest(chatsResult);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, e.Message);
+            return StatusCode(500, ReturnResult<Chat>.Failed());
+        }
+    }
+
+    [HttpPatch]
+    public async Task<ActionResult<ReturnResult<Chat>>> AlterChat([FromBody] Chat chat)
+    {
+        try
+        {
+            var chatsResult = await _chatManager.Update(chat);
+            if (chatsResult.IsSuccess)
+                return Ok(chatsResult);
+
+            return BadRequest(chatsResult);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, e.Message);
+            return StatusCode(500, ReturnResult<Chat>.Failed());
+        }
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult<ReturnResult>> DeleteChat(int id)
+    {
+        try
+        {
+            var chatsResult = await _chatManager.Delete(id);
+            if (chatsResult.IsSuccess)
+                return Ok(chatsResult);
+
+            return BadRequest(chatsResult);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, e.Message);
+            return StatusCode(500, ReturnResult.Failed());
         }
     }
 }

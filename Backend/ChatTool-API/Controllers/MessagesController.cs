@@ -1,5 +1,4 @@
 using ChatTool.API.Interfaces;
-using ChatTool.API.Managers;
 using ChatTool.API.Models;
 using ChatTool.Database.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -30,10 +29,11 @@ public class MessageController : ControllerBase
             if (messageResult.IsSuccess)
                 return Ok(messageResult);
 
-            return Unauthorized(messageResult);
+            return BadRequest(messageResult);
         }
         catch (Exception e)
         {
+            _logger.LogError(e, e.Message);
             return StatusCode(500, ReturnResult<List<Message>>.Failed());
         }
     }
@@ -47,10 +47,11 @@ public class MessageController : ControllerBase
             if (messageResult.IsSuccess)
                 return Ok(messageResult);
 
-            return Unauthorized(messageResult);
+            return BadRequest(messageResult);
         }
         catch (Exception e)
         {
+            _logger.LogError(e, e.Message);
             return StatusCode(500, ReturnResult<Message>.Failed());
         }
     }
@@ -64,10 +65,47 @@ public class MessageController : ControllerBase
             if (messageResult.IsSuccess)
                 return Ok(messageResult);
 
-            return Unauthorized(messageResult);
+            return BadRequest(messageResult);
         }
         catch (Exception e)
         {
+            _logger.LogError(e, e.Message);
+            return StatusCode(500, ReturnResult<string>.Failed());
+        }
+    }
+
+    [HttpPatch]
+    public async Task<ActionResult> UpdateMessage([FromBody] Message message)
+    {
+        try
+        {
+            var messageResult = await _messageManager.Update(message);
+            if (messageResult.IsSuccess)
+                return Ok(messageResult);
+
+            return BadRequest(messageResult);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, e.Message);
+            return StatusCode(500, ReturnResult<string>.Failed());
+        }
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult> DeleteMessage(int id)
+    {
+        try
+        {
+            var messageResult = await _messageManager.Delete(id);
+            if (messageResult.IsSuccess)
+                return Ok(messageResult);
+            
+            return BadRequest(messageResult);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, e.Message);
             return StatusCode(500, ReturnResult<string>.Failed());
         }
     }

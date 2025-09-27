@@ -26,9 +26,8 @@ public class UserManager : IUserManager
     {
         var userResult = await _db.Users.FindAsync(id);
         if (userResult == null)
-        {
             return ReturnResult<User>.Failed(null!, "Could not Find User.");
-        }
+
         return ReturnResult<User>.Success(userResult!);
     }
 
@@ -36,23 +35,22 @@ public class UserManager : IUserManager
     {
         var userResult = await _db.Users.FirstOrDefaultAsync(u => u.Username == username);
         if (userResult == null)
-        {
             return ReturnResult<User>.Failed(null!, "Could not Find User.");
-        }
+
         return ReturnResult<User>.Success(userResult!);
     }
 
-    public async Task<ReturnResult<User>> Insert(User user)
+    public Task<ReturnResult<User>> Insert(User user)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<ReturnResult<User>> Update(User user)
+    public Task<ReturnResult<User>> Update(User user)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<ReturnResult<User>> Delete(int id)
+    public Task<ReturnResult> Delete(int id)
     {
         throw new NotImplementedException();
     }

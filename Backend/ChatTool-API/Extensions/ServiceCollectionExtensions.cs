@@ -2,15 +2,8 @@
 using ChatTool.API.Managers;
 using ChatTool.API.Models.Settings;
 using ChatTool.Database;
-using ChatTool.Database.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
 
 namespace ChatTool.API.Extensions;
 
@@ -78,6 +71,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITokenManager, TokenManager>();
         services.AddScoped<IAuthManager, AuthManager>();
         services.AddScoped<IUserManager, UserManager>();
+        services.AddScoped<IChatManager, ChatManager>();
+        services.AddScoped<IMessageManager, MessageManager>();
 
         return services;
     }

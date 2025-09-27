@@ -3,7 +3,6 @@ using ChatTool.API.Models;
 using ChatTool.Database.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace ChatTool.API.Controllers;
 
@@ -30,10 +29,11 @@ public class UsersController : ControllerBase
             if (usersResult.IsSuccess)
                 return Ok(usersResult);
 
-            return Unauthorized(usersResult);
+            return BadRequest(usersResult);
         }
         catch (Exception e)
         {
+            _logger.LogError(e, e.Message);
             return StatusCode(500, ReturnResult<List<User>>.Failed());
         }
     }
@@ -47,10 +47,11 @@ public class UsersController : ControllerBase
             if (usersResult.IsSuccess)
                 return Ok(usersResult);
 
-            return Unauthorized(usersResult);
+            return BadRequest(usersResult);
         }
         catch (Exception e)
         {
+            _logger.LogError(e, e.Message);
             return StatusCode(500, ReturnResult<User>.Failed());
         }
     }
@@ -64,10 +65,11 @@ public class UsersController : ControllerBase
             if (usersResult.IsSuccess)
                 return Ok(usersResult);
 
-            return Unauthorized(usersResult);
+            return BadRequest(usersResult);
         }
         catch (Exception e)
         {
+            _logger.LogError(e, e.Message);
             return StatusCode(500, ReturnResult<User>.Failed());
         }
     }
