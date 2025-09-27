@@ -1,0 +1,17 @@
+.user-list {
+  padding: 1rem;
+  border-right: 1px solid #ccc;
+  height: 100%;
+  overflow-y: auto;
+}
+.user-list ul {
+  list-style: none;
+  padding: 0;
+}
+.user-list li {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+.user-list li:hover {
+  background-color: #f0f0f0;
+}
