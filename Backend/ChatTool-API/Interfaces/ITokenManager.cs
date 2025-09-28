@@ -1,10 +1,9 @@
-﻿using ChatTool.API.Models;
+﻿using ChatTool.Models;
 
-namespace ChatTool.API.Interfaces
+namespace ChatTool.API.Interfaces;
+
+public interface ITokenManager
 {
-    public interface ITokenManager
-    {
-        public ReturnResult<string> CreateToken(int userId, string userName);
-        public ReturnResult<int> ValidateToken(string token);
-    }
+    public ReturnResult<string> CreateToken(int userId, string userName);
+    public ReturnResult<int> ValidateToken(string token);
 }

@@ -1,17 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ChatTool.Database.Models;
+namespace ChatTool.Models.DTOs;
 
-public class Message
+public class MessageDTO
 {
     [Key]
     public int Id { get; set; }
 
     [Required]
-    public required Chat Chat { get; set; }
+    public required ChatDTO Chat { get; set; }
 
     [Required]
-    public required User Sender { get; set; }
+    public required UserDTO Sender { get; set; }
 
     public DateTime SentAt { get; set; }
 

@@ -33,6 +33,8 @@ public class DBContext : DbContext
             .HasMany(c => c.Participants)
             .WithMany(u => u.Chats);
 
+        modelBuilder.Entity<Chat>().Navigation(c => c.Participants).AutoInclude(true);
+
         modelBuilder.Entity<Message>()
             .HasOne(m => m.Sender)
             .WithMany()

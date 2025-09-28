@@ -1,5 +1,5 @@
 using ChatTool.API.Interfaces;
-using ChatTool.API.Models;
+using ChatTool.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatTool.API.Controllers;
@@ -30,6 +30,7 @@ public class AuthController : ControllerBase
         }
         catch (Exception e)
         {
+            _logger.LogError(e, "Error during login");
             return StatusCode(500, ReturnResult<string>.Failed());
         }
     }
@@ -47,6 +48,7 @@ public class AuthController : ControllerBase
         }
         catch (Exception e)
         {
+            _logger.LogError(e, "Error during register");
             return StatusCode(500, ReturnResult<string>.Failed());
         }
     }

@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatTool.Database", "ChatTo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatTool.Database.Models", "ChatTool.Database.Models\ChatTool.Database.Models.csproj", "{043561F0-5BC3-4145-A1F4-E1E46B69CF43}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatTool.Mapper", "ChatTool.Mapper\ChatTool.Mapper.csproj", "{EE647870-5B2F-451B-B17A-60BAC4B59CA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatTool.Models", "ChatTool.Models\ChatTool.Models.csproj", "{61A54EEB-0549-478C-B545-0D96060C34B6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{043561F0-5BC3-4145-A1F4-E1E46B69CF43}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{043561F0-5BC3-4145-A1F4-E1E46B69CF43}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{043561F0-5BC3-4145-A1F4-E1E46B69CF43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE647870-5B2F-451B-B17A-60BAC4B59CA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE647870-5B2F-451B-B17A-60BAC4B59CA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE647870-5B2F-451B-B17A-60BAC4B59CA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE647870-5B2F-451B-B17A-60BAC4B59CA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61A54EEB-0549-478C-B545-0D96060C34B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61A54EEB-0549-478C-B545-0D96060C34B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61A54EEB-0549-478C-B545-0D96060C34B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61A54EEB-0549-478C-B545-0D96060C34B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

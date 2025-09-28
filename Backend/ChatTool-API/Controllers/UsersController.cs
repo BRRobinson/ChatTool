@@ -1,6 +1,6 @@
 using ChatTool.API.Interfaces;
-using ChatTool.API.Models;
-using ChatTool.Database.Models;
+using ChatTool.Models;
+using ChatTool.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +21,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<ReturnResult<List<User>>>> GetUsers()
+    public async Task<ActionResult<ReturnResult<List<UserDTO>>>> GetUsers()
     {
         try
         {
@@ -34,12 +34,12 @@ public class UsersController : ControllerBase
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return StatusCode(500, ReturnResult<List<User>>.Failed());
+            return StatusCode(500, ReturnResult<List<UserDTO>>.Failed());
         }
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<ReturnResult<User>>> GetUser(int id)
+    public async Task<ActionResult<ReturnResult<UserDTO>>> GetUser(int id)
     {
         try
         {
@@ -52,12 +52,12 @@ public class UsersController : ControllerBase
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return StatusCode(500, ReturnResult<User>.Failed());
+            return StatusCode(500, ReturnResult<UserDTO>.Failed());
         }
     }
 
     [HttpGet("{username}")]
-    public async Task<ActionResult<ReturnResult<User>>> GetUser(string username)
+    public async Task<ActionResult<ReturnResult<UserDTO>>> GetUser(string username)
     {
         try
         {
@@ -70,7 +70,7 @@ public class UsersController : ControllerBase
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return StatusCode(500, ReturnResult<User>.Failed());
+            return StatusCode(500, ReturnResult<UserDTO>.Failed());
         }
     }
 }

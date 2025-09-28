@@ -1,21 +1,21 @@
-﻿using ChatTool.API.Models;
-using ChatTool.Database.Models;
+﻿using ChatTool.Models;
+using ChatTool.Models.DTOs;
 
 namespace ChatTool.API.Interfaces;
 
 public interface IChatManager
 {
-    public Task<ReturnResult<List<Chat>>> GetChats();
+    public Task<ReturnResult<List<ChatDTO>>> GetChats();
 
-    public Task<ReturnResult<List<Chat>>> GetUserChats(string user);
+    public Task<ReturnResult<List<ChatDTO>>> GetUserChats(string user);
 
-    public Task<ReturnResult<List<Chat>>> GetUserChatsBytitle(string user, string title);
+    public Task<ReturnResult<List<ChatDTO>>> GetUserChatsBytitle(string user, string title);
 
-    public Task<ReturnResult<Chat>> GetChatById(int id);
+    public Task<ReturnResult<ChatDTO>> GetChatById(int id);
 
-    public Task<ReturnResult<Chat>> Insert(Chat chat);
+    public Task<ReturnResult<ChatDTO>> Insert(ChatDTO chat);
 
-    public Task<ReturnResult<Chat>> Update(Chat chat);
+    public Task<ReturnResult<ChatDTO>> Update(ChatDTO chat);
 
     public Task<ReturnResult> Delete(int id);
 }

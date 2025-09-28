@@ -1,69 +1,68 @@
 ﻿using ChatTool.API.Interfaces;
-using ChatTool.API.Models;
 using ChatTool.Database;
 using ChatTool.Database.Models;
+using ChatTool.Models;
 
-namespace ChatTool.API.Managers
+namespace ChatTool.API.Managers;
+
+public class AuthManager : IAuthManager
 {
-    public class AuthManager : IAuthManager
+    private readonly ILogger<AuthManager> _logger;
+    private readonly ITokenManager _tokenManager;
+    private readonly DBContext _db;
+
+    public AuthManager(ILogger<AuthManager> logger, ITokenManager tokenManager, DBContext db)
     {
-        private readonly ILogger<AuthManager> _logger;
-        private readonly ITokenManager _tokenManager;
-        private readonly DBContext _db;
+        _logger = logger;
+        _tokenManager = tokenManager;
+        _db = db;
+    }
 
-        public AuthManager(ILogger<AuthManager> logger, ITokenManager tokenManager, DBContext db)
+    public ReturnResult<string> Login(LoginRequest loginRequest)
+    {
+        try
         {
-            _logger = logger;
-            _tokenManager = tokenManager;
-            _db = db;
+            var user = _db.Users.SingleOrDefault(u => u.Username == loginRequest.Username);
+            if (user == null)
+                return ReturnResult<string>.Failed(default!, "Username could not be found.");
+
+            if (!BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.PasswordHash))
+                return ReturnResult<string>.Failed(default!, "Username or Password incorrect.");
+
+            return _tokenManager.CreateToken(user.Id, user.Username);
         }
-
-        public ReturnResult<string> Login(LoginRequest loginRequest)
+        catch (Exception e)
         {
-            try
-            {
-                var user = _db.Users.SingleOrDefault(u => u.Username == loginRequest.Username);
-                if (user == null)
-                    return ReturnResult<string>.Failed(default!, "Username could not be found.");
 
-                if (!BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.PasswordHash))
-                    return ReturnResult<string>.Failed(default!, "Username or Password incorrect.");
-
-                return _tokenManager.CreateToken(user.Id, user.Username);
-            }
-            catch (Exception e)
-            {
-
-                throw;
-            }
+            throw;
         }
+    }
 
-        public ReturnResult<string> Register(LoginRequest loginRequest)
+    public ReturnResult<string> Register(LoginRequest loginRequest)
+    {
+        try
         {
-            try
+            var user = _db.Users.SingleOrDefault(u => u.Username == loginRequest.Username);
+
+            if (user != null)
+                return ReturnResult<string>.Failed(default!, "User already exists with that Username.");
+
+            _db.Users.Add(new User
             {
-                var user = _db.Users.SingleOrDefault(u => u.Username == loginRequest.Username);
+                Username = loginRequest.Username,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(loginRequest.Password)
+            });
 
-                if (user != null)
-                    return ReturnResult<string>.Failed(default!, "User already exists with that Username.");
+            _db.SaveChanges();
 
-                _db.Users.Add(new User
-                {
-                    Username = loginRequest.Username,
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(loginRequest.Password)
-                });
+            user = _db.Users.SingleOrDefault(u => u.Username == loginRequest.Username);
 
-                _db.SaveChanges();
+            return _tokenManager.CreateToken(user!.Id, user.Username);
+        }
+        catch (Exception e)
+        {
 
-                user = _db.Users.SingleOrDefault(u => u.Username == loginRequest.Username);
-
-                return _tokenManager.CreateToken(user.Id, user.Username);
-            }
-            catch (Exception e)
-            {
-
-                throw;
-            }
+            throw;
         }
     }
 }

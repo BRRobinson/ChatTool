@@ -1,6 +1,6 @@
 using ChatTool.API.Interfaces;
-using ChatTool.API.Models;
-using ChatTool.Database.Models;
+using ChatTool.Models;
+using ChatTool.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +21,7 @@ public class ChatsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<ReturnResult<List<Chat>>>> GetChat()
+    public async Task<ActionResult<ReturnResult<List<ChatDTO>>>> GetChat()
     {
         try
         {
@@ -34,12 +34,12 @@ public class ChatsController : ControllerBase
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return StatusCode(500, ReturnResult<List<Chat>>.Failed());
+            return StatusCode(500, ReturnResult<List<ChatDTO>>.Failed());
         }
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<ReturnResult<Chat>>> GetChat(int id)
+    public async Task<ActionResult<ReturnResult<ChatDTO>>> GetChat(int id)
     {
         try
         {
@@ -52,12 +52,12 @@ public class ChatsController : ControllerBase
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return StatusCode(500, ReturnResult<Chat>.Failed());
+            return StatusCode(500, ReturnResult<ChatDTO>.Failed());
         }
     }
 
     [HttpPost]
-    public async Task<ActionResult<ReturnResult<Chat>>> CreateChat([FromBody] Chat chat)
+    public async Task<ActionResult<ReturnResult<ChatDTO>>> CreateChat([FromBody] ChatDTO chat)
     {
         try
         {
@@ -70,12 +70,12 @@ public class ChatsController : ControllerBase
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return StatusCode(500, ReturnResult<Chat>.Failed());
+            return StatusCode(500, ReturnResult<ChatDTO>.Failed());
         }
     }
 
     [HttpPatch]
-    public async Task<ActionResult<ReturnResult<Chat>>> AlterChat([FromBody] Chat chat)
+    public async Task<ActionResult<ReturnResult<ChatDTO>>> AlterChat([FromBody] ChatDTO chat)
     {
         try
         {
@@ -88,7 +88,7 @@ public class ChatsController : ControllerBase
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return StatusCode(500, ReturnResult<Chat>.Failed());
+            return StatusCode(500, ReturnResult<ChatDTO>.Failed());
         }
     }
 

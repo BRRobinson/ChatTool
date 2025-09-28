@@ -20,6 +20,7 @@ public class DatabaseController : ControllerBase
     [HttpGet("DBSync")]
     public IActionResult DBSync()
     {
+        bool canConnect = _dbContext.Database.CanConnect();
         _dbContext.Database.Migrate();
         return Ok();
     }

@@ -1,4 +1,4 @@
-﻿namespace ChatTool.API.Models.Settings
+﻿namespace ChatTool.Models.Settings
 {
     public class ConnectionStrings
     {

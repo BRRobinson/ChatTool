@@ -8,7 +8,7 @@ public static class DbSeeder
     {
         if (!db.Users.Any())
         {
-            db.Users.AddRange([
+            db.Users.AddRange(
                 new User
                 {
                     Username = "Brandon",
@@ -33,9 +33,9 @@ public static class DbSeeder
                 {
                     Username = "Ian",
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword("password123")
-                },
-            ]);
-            db.SaveChanges();
+                }
+            );
         }
+        db.SaveChanges();
     }
 }

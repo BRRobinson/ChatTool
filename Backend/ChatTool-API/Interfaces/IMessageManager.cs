@@ -1,23 +1,23 @@
-﻿using ChatTool.API.Models;
-using ChatTool.Database.Models;
+﻿using ChatTool.Models;
+using ChatTool.Models.DTOs;
 
 namespace ChatTool.API.Interfaces;
 
 public interface IMessageManager
 {
-    public Task<ReturnResult<List<Message>>> GetMessages();
+    public Task<ReturnResult<List<MessageDTO>>> GetMessages();
 
-    public Task<ReturnResult<List<Message>>> GetMessagesBySender(string sender);
+    public Task<ReturnResult<List<MessageDTO>>> GetMessagesBySender(string sender);
 
-    public Task<ReturnResult<List<Message>>> GetMessagesByChat(int chatId);
+    public Task<ReturnResult<List<MessageDTO>>> GetMessagesByChat(int chatId);
 
-    public Task<ReturnResult<List<Message>>> GetMessagesByChatSender(int chatId, string sender);
+    public Task<ReturnResult<List<MessageDTO>>> GetMessagesByChatSender(int chatId, string sender);
 
-    public Task<ReturnResult<Message>> GetMessageById(int id);
+    public Task<ReturnResult<MessageDTO>> GetMessageById(int id);
 
-    public Task<ReturnResult<Message>> Insert(Message message);
+    public Task<ReturnResult<MessageDTO>> Insert(MessageDTO message);
 
-    public Task<ReturnResult<Message>> Update(Message message);
+    public Task<ReturnResult<MessageDTO>> Update(MessageDTO message);
 
     public Task<ReturnResult> Delete(int id);
 }

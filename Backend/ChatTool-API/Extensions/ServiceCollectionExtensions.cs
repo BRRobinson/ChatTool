@@ -1,8 +1,10 @@
 ﻿using ChatTool.API.Interfaces;
 using ChatTool.API.Managers;
-using ChatTool.API.Models.Settings;
 using ChatTool.Database;
+using ChatTool.Mapper;
+using ChatTool.Models.Settings;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 
 namespace ChatTool.API.Extensions;
@@ -56,15 +58,22 @@ public static class ServiceCollectionExtensions
             });
         });
 
+        services.AddAutoMapper(cfg =>
+        {
+            cfg.AddProfile<UserProfile>();
+            cfg.AddProfile<ChatProfile>();
+            cfg.AddProfile<MessageProfile>();
+        });
+
         services.Configure<AppSettings>(configuration);
 
         services.AddDbContext<DBContext>(options =>
         {
-            options.UseInMemoryDatabase("ChatToolDB");
-            //options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), builder =>
-            //{
-            //    builder.MigrationsAssembly("ChatTool.API");
-            //});
+            //options.UseInMemoryDatabase("ChatToolDB");
+            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), builder =>
+            {
+                builder.MigrationsAssembly("ChatTool.API");
+            });
             options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         });
 

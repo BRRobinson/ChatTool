@@ -1,6 +1,6 @@
 using ChatTool.API.Interfaces;
-using ChatTool.API.Models;
-using ChatTool.Database.Models;
+using ChatTool.Models;
+using ChatTool.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +21,7 @@ public class MessageController : ControllerBase
     }
 
     [HttpGet("chat/{chatId:int}")]
-    public async Task<ActionResult<ReturnResult<List<Message>>>> GetMessagesByChat(int chatId)
+    public async Task<ActionResult<ReturnResult<List<MessageDTO>>>> GetMessagesByChat(int chatId)
     {
         try
         {
@@ -34,12 +34,12 @@ public class MessageController : ControllerBase
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return StatusCode(500, ReturnResult<List<Message>>.Failed());
+            return StatusCode(500, ReturnResult<List<MessageDTO>>.Failed());
         }
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<ReturnResult<Message>>> GetMessage(int id)
+    public async Task<ActionResult<ReturnResult<MessageDTO>>> GetMessage(int id)
     {
         try
         {
@@ -52,12 +52,12 @@ public class MessageController : ControllerBase
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
-            return StatusCode(500, ReturnResult<Message>.Failed());
+            return StatusCode(500, ReturnResult<MessageDTO>.Failed());
         }
     }
 
     [HttpPost]
-    public async Task<ActionResult> PostMessage([FromBody] Message message)
+    public async Task<ActionResult> PostMessage([FromBody] MessageDTO message)
     {
         try
         {
@@ -75,7 +75,7 @@ public class MessageController : ControllerBase
     }
 
     [HttpPatch]
-    public async Task<ActionResult> UpdateMessage([FromBody] Message message)
+    public async Task<ActionResult> UpdateMessage([FromBody] MessageDTO message)
     {
         try
         {

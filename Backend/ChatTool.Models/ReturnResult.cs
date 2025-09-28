@@ -1,4 +1,4 @@
-﻿namespace ChatTool.API.Models;
+﻿namespace ChatTool.Models;
 
 public class ReturnResult
 {
