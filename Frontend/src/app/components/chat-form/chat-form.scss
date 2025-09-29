@@ -1,0 +1,38 @@
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+label {
+  font-weight: 500;
+}
+
+input, select {
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+}
+
+select[multiple] {
+  height: 120px;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: #2563eb;
+  color: #fff;
+  border-radius: 0.375rem;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #dc2626;
+  font-size: 0.85rem;
+}

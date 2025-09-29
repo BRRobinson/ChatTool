@@ -25,12 +25,12 @@ public class UserManager : IUserManager
 
     public async Task<ReturnResult<List<UserDTO>>> GetUsers()
     {
-        return ReturnResult<List<UserDTO>>.Success(await _db.Users.ProjectTo<UserDTO>(_mapper.ConfigurationProvider).ToListAsync());
+        return ReturnResult<List<UserDTO>>.Success(await _db.Users.AsNoTracking().ProjectTo<UserDTO>(_mapper.ConfigurationProvider).ToListAsync());
     }
 
     public async Task<ReturnResult<UserDTO>> GetUserById(int id)
     {
-        var userResult = await _db.Users.FindAsync(id);
+        var userResult = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
         if (userResult == null)
             return ReturnResult<UserDTO>.Failed(null!, "Could not Find User.");
 
@@ -39,7 +39,7 @@ public class UserManager : IUserManager
 
     public async Task<ReturnResult<UserDTO>> GetUserByUsername(string username)
     {
-        var userResult = await _db.Users.FirstOrDefaultAsync(u => u.Username == username);
+        var userResult = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username == username);
         if (userResult == null)
             return ReturnResult<UserDTO>.Failed(null!, "Could not Find User.");
 

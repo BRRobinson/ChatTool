@@ -74,7 +74,7 @@ public static class ServiceCollectionExtensions
             {
                 builder.MigrationsAssembly("ChatTool.API");
             });
-            options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            options.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
         });
 
         services.AddScoped<ITokenManager, TokenManager>();

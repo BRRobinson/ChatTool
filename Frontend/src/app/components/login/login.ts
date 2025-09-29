@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ToastService } from '../../services/toast.service';
-import { LoginRequest } from '../../models/login-request.model';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ToastService } from '../../services/toast/toast.service';
+import { LoginRequestModel } from '../../models/login-request.model';
 import { ReturnResult } from '../../models/return-result.model';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -24,8 +24,8 @@ export class Login {
 
   public loginForm: FormGroup;
   
-  constructor() {
-    this.loginForm = new FormGroup({
+  constructor(private fb: FormBuilder) {
+    this.loginForm = this.fb.group({
       username: new FormControl('', [Validators.required]),
       password: new FormControl('', [Validators.required]),
     });
@@ -36,7 +36,7 @@ export class Login {
       return;
 
     this.authService.login(
-      new LoginRequest(
+      new LoginRequestModel(
         this.loginForm.value.username, 
         this.loginForm.value.password
       )).subscribe({
@@ -60,7 +60,7 @@ export class Login {
       return;
     
     this.authService.register(
-      new LoginRequest(
+      new LoginRequestModel(
         this.loginForm.value.username, 
         this.loginForm.value.password
       )).subscribe({

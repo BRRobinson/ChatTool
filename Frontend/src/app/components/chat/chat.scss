@@ -4,15 +4,84 @@
   height: 100%;
   padding: 0 1rem;
 }
+
 .messages {
+  gap: 0.75rem;
+  padding: 1rem;
   flex: 1;
   overflow-y: auto;
-  margin-bottom: 1rem;
 }
+
+.own, .other {
+  display: flex;
+}
+
+.own {
+  justify-content: flex-start;
+}
+
+.other {
+  justify-content: flex-start;
+}
+
+.bubble {
+  display: block;
+  max-width: 70%;
+  padding: 0.75rem 1rem 1.25rem;
+  margin: 0.5rem;
+  border-radius: 1.25rem;
+  line-height: 1.4;
+  box-shadow: 0 4px 5px rgba(0,0,0,0.15);
+  transition: transform 0.2s ease-in-out;
+}
+
+.own .bubble {
+  background:  #117594;
+  color: white;
+  border: 1px solid rgba(255,255,255,0.3);
+  text-align: left;
+  animation: transform 0.2s ease-in-out;
+}
+
+.other .bubble {
+  background: #f1f1f1;
+  color: #333;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.bubble:hover {
+  transform: scale(1.03);
+}
+
+.own .timestamp {
+  display: block;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 0.25rem;
+  text-align: right;
+}
+
+.other .timestamp {
+  display: block;
+  font-size: 0.75rem;
+  color: rgba(0, 0, 0, 0.6);
+  margin-top: 0.25rem;
+  text-align: right;
+}
+
+.bubble-buttons {
+  display: flex;
+  gap: 0.5rem;      /* space between buttons */
+  margin-top: 0.5rem; /* space from input */
+  flex-wrap: wrap;    /* optional if buttons overflow */
+}
+
 .input-area {
   display: flex;
   gap: 0.5rem;
 }
+
 .input-area input {
   flex: 1;
   padding: 0.5rem;

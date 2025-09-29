@@ -1,8 +1,23 @@
-<div class="user-list">
-  <h3>Chats</h3>
-  <ul>
-    <li *ngFor="let user of chats" (click)="selectUser(user)">
-      {{ user.username }}
-    </li>
-  </ul>
+<div class="chat-list-container">
+  <h1 class="title">Chats</h1>
+  <div class="chat-actions">
+    <button class="btn input" (click)="onInsertChat()">Insert</button>
+    <button class="btn edit" (click)="onEditChat(selectedChat)">Edit</button>
+    <button class="btn delete" (click)="onDeleteChat(selectedChat)">Delete</button>
+  </div>
+  <div *ngIf="chats.length; else noChats">
+    <ul class="chat-list">
+      <li *ngFor="let chat of chats" (click)="onSelectChat(chat)">
+        <div class="chat-info">
+          <h3 class="chat-title">{{ chat.title }}</h3>
+          <!-- <p class="chat-last-message"> {{ chatLastMessage(chat) }}</p> -->
+        </div>
+
+      </li>
+    </ul>
+  </div>
+
+  <ng-template #noChats>
+    <p class="no-chats">No chats found. Create one above!</p>
+  </ng-template>
 </div>

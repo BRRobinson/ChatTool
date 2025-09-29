@@ -16,5 +16,7 @@ public class Message
     public DateTime SentAt { get; set; }
 
     [Required]
-    public required string message { get; set; }
+    public required string Content { get; set; }
+
+    public bool IsEdited { get; set; }
 }

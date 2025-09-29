@@ -24,7 +24,7 @@ public class MessageManager : IMessageManager
 
     public async Task<ReturnResult<List<MessageDTO>>> GetMessages()
     {
-        return ReturnResult<List<MessageDTO>>.Success(await _db.Messages.ProjectTo<MessageDTO>(_mapper.ConfigurationProvider).ToListAsync());
+        return ReturnResult<List<MessageDTO>>.Success(await _db.Messages.AsNoTracking().ProjectTo<MessageDTO>(_mapper.ConfigurationProvider).ToListAsync());
     }
 
     public async Task<ReturnResult<List<MessageDTO>>> GetMessagesByChat(int chatId)
@@ -33,7 +33,7 @@ public class MessageManager : IMessageManager
         if (chatResult == null)
             return ReturnResult<List<MessageDTO>>.Failed(null!, "Could not Find Chat for Messages.");
 
-        return ReturnResult<List<MessageDTO>>.Success(await _db.Messages.Where(m => m.Chat.Id == chatId).ProjectTo<MessageDTO>(_mapper.ConfigurationProvider).ToListAsync());
+        return ReturnResult<List<MessageDTO>>.Success(await _db.Messages.AsNoTracking().Where(m => m.Chat.Id == chatId).ProjectTo<MessageDTO>(_mapper.ConfigurationProvider).ToListAsync());
     }
 
     public async Task<ReturnResult<List<MessageDTO>>> GetMessagesBySender(string sender)
@@ -42,7 +42,7 @@ public class MessageManager : IMessageManager
         if (senderResult == null)
             return ReturnResult<List<MessageDTO>>.Failed(null!, "Could not Find Sender for Messages.");
 
-        return ReturnResult<List<MessageDTO>>.Success(await _db.Messages.Where(m => m.Sender.Id == senderResult.Id).ProjectTo<MessageDTO>(_mapper.ConfigurationProvider).ToListAsync());
+        return ReturnResult<List<MessageDTO>>.Success(await _db.Messages.AsNoTracking().Where(m => m.Sender.Id == senderResult.Id).ProjectTo<MessageDTO>(_mapper.ConfigurationProvider).ToListAsync());
     }
 
     public async Task<ReturnResult<List<MessageDTO>>> GetMessagesByChatSender(int chatId, string sender)
@@ -55,12 +55,12 @@ public class MessageManager : IMessageManager
         if (senderResult == null)
             return ReturnResult<List<MessageDTO>>.Failed(null!, "Could not Find Sender for Messages.");
 
-        return ReturnResult<List<MessageDTO>>.Success(await _db.Messages.Where(m => m.Chat.Id == chatId && m.Sender.Id == senderResult.Id).ProjectTo<MessageDTO>(_mapper.ConfigurationProvider).ToListAsync());
+        return ReturnResult<List<MessageDTO>>.Success(await _db.Messages.AsNoTracking().Where(m => m.Chat.Id == chatId && m.Sender.Id == senderResult.Id).ProjectTo<MessageDTO>(_mapper.ConfigurationProvider).ToListAsync());
     }
 
     public async Task<ReturnResult<MessageDTO>> GetMessageById(int id)
     {
-        var messageResult = await _db.Messages.FindAsync(id);
+        var messageResult = await _db.Messages.AsNoTracking().FirstOrDefaultAsync(m => m.Id == id);
         if (messageResult == null)
             return ReturnResult<MessageDTO>.Failed(null!, "Could not Find Message.");
 
@@ -104,9 +104,8 @@ public class MessageManager : IMessageManager
         if (messageEntity == null)
             throw new Exception("message not found");
 
-        messageEntity.message = messageDto.message;
-
-        _db.Messages.Update(messageEntity);
+        messageEntity.Content = messageDto.Content;
+        messageEntity.IsEdited = true;
 
         await _db.SaveChangesAsync();
 
@@ -135,7 +134,7 @@ public class MessageManager : IMessageManager
         if (senderResult == null)
             return ReturnResult<MessageDTO>.Failed(null!, "Could not Find Sender for Message.");
 
-        if (string.IsNullOrWhiteSpace(messageDto.message))
+        if (string.IsNullOrWhiteSpace(messageDto.Content))
             return ReturnResult<MessageDTO>.Failed(null!, "Message content is null or empty.");
 
         return ReturnResult<MessageDTO>.Success(messageDto);

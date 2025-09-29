@@ -1,4 +1,11 @@
 <div class="home-layout">
-  <app-chat-list (chatSelected)="onChatSelected($event)"></app-chat-list>
-  <app-chat [selectedChat]="selectedChat"></app-chat>
+  
+  <aside class="chat-sidebar">
+    <app-chat-list (selectChat)="onChatSelected($event)" (insertChat)="onInsertChat()" (editChat)="onEditChat($event)"></app-chat-list>
+  </aside>
+
+  <main class="main-pane">
+    <app-chat *ngIf="!chatForm" [selectedChat]="selectedChat"></app-chat>
+    <app-chat-form *ngIf="chatForm" [chat]="selectedChat" (saved)="onChatSaved($event)"></app-chat-form>
+  </main>
 </div>

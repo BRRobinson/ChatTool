@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChatTool.API.Migrations
 {
     [DbContext(typeof(DBContext))]
-    [Migration("20250927230519_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250928170256_2025-9-28-1")]
+    partial class _20259281
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,6 +53,13 @@ namespace ChatTool.API.Migrations
                     b.Property<int>("ChatId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsEdited")
+                        .HasColumnType("bit");
+
                     b.Property<int>("SenderId")
                         .HasColumnType("int");
 
@@ -61,10 +68,6 @@ namespace ChatTool.API.Migrations
 
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
-
-                    b.Property<string>("message")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

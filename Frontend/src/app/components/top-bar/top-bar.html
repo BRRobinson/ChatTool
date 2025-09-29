@@ -3,7 +3,7 @@
     <h2>ChatTool</h2>
   </div>
   <div class="right" *ngIf="activeUser">
-    <span>{{ activeUser }}</span>
+    <span>{{ activeUser.username }}</span>
     <button (click)="logout.emit()">Logout</button>
   </div>
 </header>

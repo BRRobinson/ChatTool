@@ -1,8 +1,8 @@
 // src/app/core/guards/auth.guard.ts
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
-import { ToastService } from '../services/toast.service';
+import { AuthService } from '../services/auth/auth.service';
+import { ToastService } from '../services/toast/toast.service';
 
 export const unAuthGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);

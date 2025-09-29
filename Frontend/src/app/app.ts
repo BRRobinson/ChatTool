@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { TopBar } from './components/top-bar/top-bar';
-import { AuthService } from './services/auth.service';
+import { AuthService } from './services/auth/auth.service';
 import { CommonModule } from '@angular/common';
 
 

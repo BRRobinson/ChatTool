@@ -1,17 +1,34 @@
-.user-list {
+.chat-list-container{
+  padding-left: 1rem;
+}
+
+.chat-list {
   padding: 1rem;
-  border-right: 1px solid #ccc;
   height: 100%;
   overflow-y: auto;
 }
-.user-list ul {
+.chat-list ul {
   list-style: none;
   padding: 0;
 }
-.user-list li {
-  padding: 0.5rem;
+.chat-list li {
+  padding: 0.1rem 0.1rem;
   cursor: pointer;
 }
-.user-list li:hover {
-  background-color: #f0f0f0;
+.chat-list li:hover {
+  background-color: #253449;
+}
+
+.chat-list-container .chat-actions button {
+  margin-left: 0.2rem;
+  padding: 0.4rem 0.8rem;
+  border: none;
+  background: #ef5350;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.chat-list-container .chat-actions button:hover {
+  background: #d32f2f;
 }

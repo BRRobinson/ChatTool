@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../services/auth/auth.service';
+import { UserModel } from '../../models/user.model';
 
 @Component({
   selector: 'app-top-bar',
@@ -14,7 +15,7 @@ export class TopBar {
 
   @Output() logout = new EventEmitter<void>();
 
-  activeUser: string | null = null;
+  activeUser: UserModel | null = null;
 
   constructor() {
     this.authService.activeUser$.subscribe(user => this.activeUser = user);

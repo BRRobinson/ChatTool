@@ -25,30 +25,30 @@ public class ChatManager : IChatManager
 
     public async Task<ReturnResult<List<ChatDTO>>> GetChats()
     {
-        return ReturnResult<List<ChatDTO>>.Success(await _db.Chats.ProjectTo<ChatDTO>(_mapper.ConfigurationProvider).ToListAsync());
+        return ReturnResult<List<ChatDTO>>.Success(await _db.Chats.AsNoTracking().ProjectTo<ChatDTO>(_mapper.ConfigurationProvider).ToListAsync());
     }
 
     public async Task<ReturnResult<List<ChatDTO>>> GetUserChats(string user)
     {
-        var userResult = await _db.Users.FirstOrDefaultAsync(u => u.Username == user);
+        var userResult = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username == user);
         if (userResult == null)
             return ReturnResult<List<ChatDTO>>.Failed(null!, "Could not Find User.");
 
-        return ReturnResult<List<ChatDTO>>.Success(await _db.Chats.Where(c => c.Participants.Contains(userResult)).ProjectTo<ChatDTO>(_mapper.ConfigurationProvider).ToListAsync());
+        return ReturnResult<List<ChatDTO>>.Success(await _db.Chats.AsNoTracking().Where(c => c.Participants.Contains(userResult)).ProjectTo<ChatDTO>(_mapper.ConfigurationProvider).ToListAsync());
     }
 
     public async Task<ReturnResult<List<ChatDTO>>> GetUserChatsBytitle(string user, string title)
     {
-        var userResult = await _db.Users.FirstOrDefaultAsync(u => u.Username == user);
+        var userResult = await _db.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Username == user);
         if (userResult == null)
             return ReturnResult<List<ChatDTO>>.Failed(null!, "Could not Find User.");
 
-        return ReturnResult<List<ChatDTO>>.Success(await _db.Chats.Where(c => c.Participants.Contains(userResult) && c.Title.Contains(title)).ProjectTo<ChatDTO>(_mapper.ConfigurationProvider).ToListAsync());
+        return ReturnResult<List<ChatDTO>>.Success(await _db.Chats.AsNoTracking().Where(c => c.Participants.Contains(userResult) && c.Title.Contains(title)).ProjectTo<ChatDTO>(_mapper.ConfigurationProvider).ToListAsync());
     }
 
     public async Task<ReturnResult<ChatDTO>> GetChatById(int id)
     {
-        var chatResult = await _db.Chats.FindAsync(id);
+        var chatResult = await _db.Chats.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
         if (chatResult == null)
             return ReturnResult<ChatDTO>.Failed(null!, "Could not Find Chat.");
 
@@ -67,7 +67,7 @@ public class ChatManager : IChatManager
             .ToListAsync();
 
         var chatEntity = _mapper.Map<Chat>(chatDto);
-
+        
         chatEntity.Participants = participants;
 
         _db.Chats.Add(chatEntity);
@@ -82,21 +82,18 @@ public class ChatManager : IChatManager
         if (!validate.IsSuccess)
             return validate;
         
-        var chatEntity = await _db.Chats.FindAsync(chatDto.Id);
+        var chatEntity = await _db.Chats.Include(c => c.Participants).FirstOrDefaultAsync(c => c.Id == chatDto.Id);
 
         if (chatEntity == null)
             throw new Exception("Chat not found");
 
         _mapper.Map(chatDto, chatEntity);
 
-        chatEntity.Participants.Clear();
         var participantIds = chatDto.Participants.Select(p => p.Id).ToList();
         var participants = await _db.Users
             .Where(u => participantIds.Contains(u.Id))
             .ToListAsync();
-        chatEntity.Participants.AddRange(participants);
-
-        _db.Chats.Update(chatEntity);
+        chatEntity.Participants = participants;
 
         await _db.SaveChangesAsync();
 

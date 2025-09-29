@@ -33,8 +33,8 @@ public class AuthManager : IAuthManager
         }
         catch (Exception e)
         {
-
-            throw;
+            _logger.LogError(e, e.Message);
+            return ReturnResult<string>.Failed(null!, e.Message);
         }
     }
 
@@ -61,8 +61,8 @@ public class AuthManager : IAuthManager
         }
         catch (Exception e)
         {
-
-            throw;
+            _logger.LogError(e, e.Message);
+            return ReturnResult<string>.Failed(null!, e.Message);
         }
     }
 }

@@ -12,7 +12,7 @@ public class Chat
     public required string Title { get; set; }
 
     [Required]
-    public required List<User> Participants { get; set; } = new List<User>();
+    public List<User> Participants { get; set; } = new List<User>();
 
     [JsonIgnore]
     public List<Message> Messages { get; set; } = new List<Message>();

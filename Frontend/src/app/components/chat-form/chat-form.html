@@ -1,0 +1,21 @@
+<form [formGroup]="chatForm" (ngSubmit)="save()">
+  <label for="title">Title</label>
+  <input id="title" type="text" formControlName="title" />
+  <div *ngIf="chatForm.get('title')?.invalid && chatForm.get('title')?.touched" class="error">
+    Title is required
+  </div>
+
+  <label>Participants</label>
+  <div *ngFor="let user of users; let i = index">
+    <input type="checkbox" [formControl]="getParticipantControl(i)" />
+    {{ user.username }}
+  </div>
+
+  <div *ngIf="selectedUsers.invalid && selectedUsers.touched" class="error">
+    Select at least one participant
+  </div>
+
+  <button type="submit" [disabled]="chatForm.invalid">
+    {{ chat ? 'Update' : 'Create' }}
+  </button>
+</form>

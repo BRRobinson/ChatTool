@@ -1,20 +1,23 @@
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable } from '@angular/core';
+import { inject, Inject, Injectable } from '@angular/core';
 import { jwtDecode } from 'jwt-decode';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { LoginRequest } from '../models/login-request.model';
-import { ReturnResult } from '../models/return-result.model';
-import { API_URL } from '../app.config';
+import { API_URL } from '../../app.config';
+import { LoginRequestModel } from '../../models/login-request.model';
+import { ReturnResult } from '../../models/return-result.model';
+import { UserModel } from '../../models/user.model';
+import { UserService } from '../user/user.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private userService = inject(UserService);
   private readonly TOKEN_KEY = 'auth_token';
-  private readonly USERNAME_KEY = 'auth_username';
+  private readonly USER_KEY = 'auth_activeuser';
 
-  private _activeUser = new BehaviorSubject<string | null>(
-    localStorage.getItem(this.USERNAME_KEY)
+  private _activeUser = new BehaviorSubject<UserModel | null>(
+    this.getActiveUser()
   );
   activeUser$ = this._activeUser.asObservable();
   
@@ -22,12 +25,18 @@ export class AuthService {
   }
 
   setActiveUser(username: string) {
-    localStorage.setItem(this.USERNAME_KEY, username);
-    this._activeUser.next(username);
+    this.userService.getUser(username).subscribe({
+      next: res => {
+        if (res.isSuccess && res.value){
+          localStorage.setItem(this.USER_KEY, JSON.stringify(res.value));
+          this._activeUser.next(res.value);
+        }
+      }
+    })
   }
   
-  getActiveUser(username: string) {
-    return localStorage.getItem(this.USERNAME_KEY);
+  getActiveUser() {
+    return JSON.parse(localStorage.getItem(this.USER_KEY)!);
   }
   
   getToken(): string | null {
@@ -47,7 +56,7 @@ export class AuthService {
     }
   }
 
-  login(loginRequest: LoginRequest): Observable<ReturnResult<string>> {
+  login(loginRequest: LoginRequestModel): Observable<ReturnResult<string>> {
     return this.http.post<ReturnResult<string>>(`${this.apiUrl}/auth/login`, loginRequest)
     .pipe(tap(response => {
         if (response.isSuccess) {
@@ -57,7 +66,7 @@ export class AuthService {
     })); 
   }
 
-  register(loginRequest: LoginRequest): Observable<ReturnResult<string>> {
+  register(loginRequest: LoginRequestModel): Observable<ReturnResult<string>> {
     return this.http.post<ReturnResult<string>>(`${this.apiUrl}/auth/register`, loginRequest)
     .pipe(tap(response => {
         if (response.isSuccess) {
@@ -78,6 +87,6 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem(this.USERNAME_KEY);
+    localStorage.removeItem(this.USER_KEY);
   }
 }
