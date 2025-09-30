@@ -1,4 +1,5 @@
 using ChatTool.API.Extensions;
+using ChatTool.API.Hubs;
 using ChatTool.Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -6,17 +7,21 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Centralized service registration
+// Centralized extension method for services (DbContext, repositories, etc.)
 builder.Services.AddChatToolServices(builder.Configuration);
 
+// Controllers
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
-// Add JWT authentication
+// Swagger / OpenAPI
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// JWT Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme   = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
 {
@@ -28,13 +33,25 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["JWT:Issuer"],
         ValidAudience = builder.Configuration["JWT:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]!))
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]!))
     };
 });
 
+// Authorization
 builder.Services.AddAuthorization();
 
+// SignalR Hubs
+builder.Services.AddSignalR();
+
 var app = builder.Build();
+
+// Seed the database
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<DBContext>();
+    DbSeeder.Seed(db);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -43,20 +60,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<DBContext>();
-    DbSeeder.Seed(db);
-}
-
-// Use the CORS policy
-app.UseCors("LocalhostOnly");
-
 app.UseHttpsRedirection();
+
+app.UseCors("LocalhostOnly");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
+//endpoint mapping
 app.MapControllers();
+app.MapHub<ChatHub>("/chathub");
+app.MapHub<MessageHub>("/messagehub");
+
 
 app.Run();

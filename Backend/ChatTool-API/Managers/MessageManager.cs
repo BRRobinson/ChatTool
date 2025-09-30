@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using ChatTool.API.Hubs;
 using ChatTool.API.Interfaces;
 using ChatTool.Database;
 using ChatTool.Database.Models;
 using ChatTool.Models;
 using ChatTool.Models.DTOs;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChatTool.API.Managers;
@@ -14,12 +16,14 @@ public class MessageManager : IMessageManager
     private readonly ILogger<MessageManager> _logger;
     private readonly DBContext _db;
     private readonly IMapper _mapper;
+    private readonly IHubContext<MessageHub> _messageHub;
 
-    public MessageManager(ILogger<MessageManager> logger, DBContext db, IMapper mapper)
+    public MessageManager(ILogger<MessageManager> logger, DBContext db, IMapper mapper, IHubContext<MessageHub> messageHub)
     {
         _logger = logger;
         _db = db;
         _mapper = mapper;
+        _messageHub = messageHub;
     }
 
     public async Task<ReturnResult<List<MessageDTO>>> GetMessages()
@@ -29,7 +33,7 @@ public class MessageManager : IMessageManager
 
     public async Task<ReturnResult<List<MessageDTO>>> GetMessagesByChat(int chatId)
     {
-        var chatResult = await _db.Chats.FindAsync(chatId);
+        var chatResult = await _db.Chats.FirstOrDefaultAsync(c => c.Id == chatId);
         if (chatResult == null)
             return ReturnResult<List<MessageDTO>>.Failed(null!, "Could not Find Chat for Messages.");
 
@@ -47,7 +51,7 @@ public class MessageManager : IMessageManager
 
     public async Task<ReturnResult<List<MessageDTO>>> GetMessagesByChatSender(int chatId, string sender)
     {
-        var chatResult = await _db.Chats.FindAsync(chatId);
+        var chatResult = await _db.Chats.FirstOrDefaultAsync(c => c.Id == chatId);
         if (chatResult == null)
             return ReturnResult<List<MessageDTO>>.Failed(null!, "Could not Find Chat for Messages.");
 
@@ -73,11 +77,11 @@ public class MessageManager : IMessageManager
         if (!validate.IsSuccess)
             return validate;
 
-        var chat = await _db.Chats.FindAsync(messageDto.Chat.Id);
+        var chat = await _db.Chats.FirstOrDefaultAsync(c => c.Id == messageDto.Chat.Id);
         if (chat == null)
             return ReturnResult<MessageDTO>.Failed(null!, "Could not Find Chat for Message.");
 
-        var sender = await _db.Users.FindAsync(messageDto.Sender.Id);
+        var sender = await _db.Users.FirstOrDefaultAsync(u => u.Id == messageDto.Sender.Id);
         if (sender == null)
             return ReturnResult<MessageDTO>.Failed(null!, "Could not Find Sender for Message.");
 
@@ -90,7 +94,10 @@ public class MessageManager : IMessageManager
         _db.Messages.Add(messageEntity);
         await _db.SaveChangesAsync();
 
-        return ReturnResult<MessageDTO>.Success(_mapper.Map<MessageDTO>(messageEntity));
+        messageDto = _mapper.Map<MessageDTO>(messageEntity);
+        await _messageHub.Clients.Group(messageEntity.Chat.Id.ToString()).SendAsync("ReceiveMessage", messageDto);
+
+        return ReturnResult<MessageDTO>.Success(messageDto);
     }
 
     public async Task<ReturnResult<MessageDTO>> Update(MessageDTO messageDto)
@@ -99,7 +106,7 @@ public class MessageManager : IMessageManager
         if (!validate.IsSuccess)
             return validate;
 
-        var messageEntity = await _db.Messages.FindAsync(messageDto.Id);
+        var messageEntity = await _db.Messages.FirstOrDefaultAsync(m => m.Id == messageDto.Id);
 
         if (messageEntity == null)
             throw new Exception("message not found");
@@ -109,28 +116,35 @@ public class MessageManager : IMessageManager
 
         await _db.SaveChangesAsync();
 
-        return ReturnResult<MessageDTO>.Success(_mapper.Map<MessageDTO>(messageEntity));
+        messageDto = _mapper.Map<MessageDTO>(messageEntity);
+        await _messageHub.Clients.Group(messageEntity.Chat.Id.ToString()).SendAsync("ReceiveMessage", messageDto);
+
+        return ReturnResult<MessageDTO>.Success(messageDto);
     }
 
     public async Task<ReturnResult> Delete(int id)
     {
-        var messageResult = await _db.Messages.FindAsync(id);
+        var messageResult = await _db.Messages.Include(m => m.Chat)
+            .FirstOrDefaultAsync(m => m.Id == id);
         if (messageResult == null)
             return ReturnResult.Failed("Could not Find Message.");
 
+        var chatId = messageResult.Chat.Id;
         _db.Messages.Remove(messageResult);
         await _db.SaveChangesAsync();
+
+        await _messageHub.Clients.Group(chatId.ToString()).SendAsync("DeleteMessage", id);
 
         return ReturnResult.Success();
     }
 
     private async Task<ReturnResult<MessageDTO>> ValidateMessage(MessageDTO messageDto)
     {
-        var chatResult = await _db.Chats.FindAsync(messageDto.Chat.Id);
+        var chatResult = await _db.Chats.FirstOrDefaultAsync(c => c.Id == messageDto.Chat.Id);
         if (chatResult == null)
             return ReturnResult<MessageDTO>.Failed(null!, "Could not Find Chat for Message.");
 
-        var senderResult = await _db.Users.FindAsync(messageDto.Sender.Id);
+        var senderResult = await _db.Users.FirstOrDefaultAsync(u => u.Id == messageDto.Sender.Id);
         if (senderResult == null)
             return ReturnResult<MessageDTO>.Failed(null!, "Could not Find Sender for Message.");
 

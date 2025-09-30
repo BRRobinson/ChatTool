@@ -4,8 +4,8 @@
     <app-chat-list (selectChat)="onChatSelected($event)" (insertChat)="onInsertChat()" (editChat)="onEditChat($event)"></app-chat-list>
   </aside>
 
-  <main class="main-pane">
-    <app-chat *ngIf="!chatForm" [selectedChat]="selectedChat"></app-chat>
-    <app-chat-form *ngIf="chatForm" [chat]="selectedChat" (saved)="onChatSaved($event)"></app-chat-form>
+  <main class="main-pane" [ngSwitch]="chatForm">
+    <app-chat *ngSwitchCase="false" [selectedChat]="selectedChat"></app-chat>
+    <app-chat-form *ngSwitchCase="true" [chat]="selectedChat" (saved)="onChatSaved($event)"></app-chat-form>
   </main>
 </div>

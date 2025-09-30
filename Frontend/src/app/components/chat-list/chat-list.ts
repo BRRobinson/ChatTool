@@ -6,6 +6,7 @@ import { MessageService } from '../../services/message/message.service';
 import { ChatModel } from '../../models/chat.model';
 import { ToastService } from '../../services/toast/toast.service';
 import { UserModel } from '../../models/user.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-chat-list',
@@ -19,6 +20,8 @@ export class ChatList {
   private toastService = inject(ToastService);
   private chatService = inject(ChatService);
   private messageService = inject(MessageService);
+  private chatRecievedSubscription!: Subscription;
+  private chatDeletesubscription!: Subscription;
 
   @Output() selectChat = new EventEmitter<ChatModel | null>();
   @Output() insertChat = new EventEmitter<ChatModel>();
@@ -37,6 +40,19 @@ export class ChatList {
 
   ngOnInit() {
     this.refreshChats();
+    
+    this.chatService.startHubConnection(this.activeUser!.id);
+
+    this.chatRecievedSubscription = this.chatService.chatReceived$.subscribe(
+      (chat: ChatModel) => {
+        this.doAddChat(chat);
+      }
+    );
+    this.chatDeletesubscription = this.chatService.chatDeleted$.subscribe(
+      (chatId: number) => {
+        this.doDeleteChat(chatId);
+      }
+    );
   }
 
   refreshChats() {
@@ -65,6 +81,17 @@ export class ChatList {
     }
   }
 
+  doAddChat(chat: ChatModel){
+    const index = this.chats.findIndex(m => m.id === chat.id);
+    if (index !== -1) {
+      // chat already exists → update it
+      this.chats[index] = chat;
+    } else {
+      // new chat → push
+      this.chats.push(chat);
+    }
+  }
+
   onDeleteChat(chat: ChatModel | null): void {
     if (chat){
       if (!confirm('Are you sure you want to delete this chat?')) return;
@@ -72,7 +99,7 @@ export class ChatList {
       this.chatService.deleteChat(chat!.id).subscribe({
         next: res => {
           if (res.isSuccess) {
-            this.refreshChats();
+            this.doDeleteChat(chat.id);
             this.selectChat.emit(null);
           } else {
             this.toastService.error(res.message);
@@ -81,5 +108,10 @@ export class ChatList {
         error: err => this.toastService.error(err.message)
       });
     }
+  }
+
+  doDeleteChat(id: number){
+    this.chats = this.chats
+      .filter(c => c.id !== id);
   }
 }

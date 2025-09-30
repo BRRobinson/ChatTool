@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using ChatTool.API.Hubs;
 using ChatTool.API.Interfaces;
 using ChatTool.Database;
 using ChatTool.Database.Models;
 using ChatTool.Mapper;
 using ChatTool.Models;
 using ChatTool.Models.DTOs;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChatTool.API.Managers;
@@ -15,12 +17,14 @@ public class ChatManager : IChatManager
     private readonly ILogger<ChatManager> _logger;
     private readonly DBContext _db;
     private readonly IMapper _mapper;
+    private readonly IHubContext<ChatHub> _chatHub;
 
-    public ChatManager(ILogger<ChatManager> logger, DBContext db, IMapper mapper)
+    public ChatManager(ILogger<ChatManager> logger, DBContext db, IMapper mapper, IHubContext<ChatHub> chatHub)
     {
         _logger = logger;
         _db = db;
         _mapper = mapper;
+        _chatHub = chatHub;
     }
 
     public async Task<ReturnResult<List<ChatDTO>>> GetChats()
@@ -73,7 +77,12 @@ public class ChatManager : IChatManager
         _db.Chats.Add(chatEntity);
         await _db.SaveChangesAsync();
 
-        return ReturnResult<ChatDTO>.Success(_mapper.Map<ChatDTO>(chatEntity));
+        chatDto = _mapper.Map<ChatDTO>(chatEntity);
+        
+        foreach (var participant in participants)
+            await _chatHub.Clients.Group(participant.Id.ToString()).SendAsync("ReceiveChat", chatDto);
+
+        return ReturnResult<ChatDTO>.Success(chatDto);
     }
 
     public async Task<ReturnResult<ChatDTO>> Update(ChatDTO chatDto)
@@ -97,16 +106,29 @@ public class ChatManager : IChatManager
 
         await _db.SaveChangesAsync();
 
-        return ReturnResult<ChatDTO>.Success(_mapper.Map<ChatDTO>(chatEntity));
+        chatDto = _mapper.Map<ChatDTO>(chatEntity);
+
+        foreach (var participant in participants)
+            await _chatHub.Clients.Group(participant.Id.ToString()).SendAsync("ReceiveChat", chatDto);
+
+        return ReturnResult<ChatDTO>.Success(chatDto);
     }
 
     public async Task<ReturnResult> Delete(int id)
     {
-        var chatResult = await _db.Chats.FindAsync(id);
+        var chatResult = await _db.Chats.FirstOrDefaultAsync(c => c.Id == id);
         if (chatResult == null)
             return ReturnResult<Chat>.Failed(null!, "Could not Find Chat.");
+
+        var participants = chatResult.Participants.Select(p => p.Id).ToList();
         _db.Chats.Remove(chatResult);
         await _db.SaveChangesAsync();
+
+        foreach (var participant in participants)
+            await _chatHub.Clients.Group(participant.ToString()).SendAsync("ReceiveChat", id);
+
+        await _chatHub.Clients.Group(id.ToString()).SendAsync("DeleteChat",  id);
+
         return ReturnResult.Success();
     }
 

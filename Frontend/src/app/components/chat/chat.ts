@@ -7,6 +7,7 @@ import { MessageModel } from '../../models/message.model';
 import { MessageService } from '../../services/message/message.service';
 import { UserModel } from '../../models/user.model';
 import { ToastService } from '../../services/toast/toast.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-chat',
@@ -18,6 +19,9 @@ import { ToastService } from '../../services/toast/toast.service';
 export class Chat {
   private toastService = inject(ToastService);
   private messageService = inject(MessageService);
+  private messageRecievedSubscription!: Subscription;
+  private messageDeletesubscription!: Subscription;
+
 
   @Input() selectedChat: ChatModel | null = null;
 
@@ -32,6 +36,7 @@ export class Chat {
   newMessage = '';
   editContent = '';
 
+  
   constructor() {
     this.authService.activeUser$.subscribe(user => this.activeUser = user);
   }
@@ -41,6 +46,19 @@ export class Chat {
     if (changes['selectedChat'] && this.selectedChat?.id) {
       this.loadMessages();
     }
+
+    this.messageService.startHubConnection(this.selectedChat!.id);
+
+    this.messageRecievedSubscription = this.messageService.messageReceived$.subscribe(
+      (message: MessageModel) => {
+        this.doAddMessage(message);
+      }
+    );
+    this.messageDeletesubscription = this.messageService.messageDeleted$.subscribe(
+      (messageId: number) => {
+        this.doDeleteMessage(messageId);
+      }
+    );
   }
 
   loadMessages() {
@@ -52,8 +70,10 @@ export class Chat {
   }
 
   selectMessage(message: MessageModel){
-    this.editContent = message.content;
-    this.selectedMessage = message;
+    if (message.sender.id === this.activeUser!.id){
+      this.editContent = message.content;
+      this.selectedMessage = message;
+    }
   }
 
   sendMessage() {
@@ -64,7 +84,7 @@ export class Chat {
     this.messageService.postMessage(message).subscribe({
       next: res => {
         if (res.isSuccess){
-          this.messages.push(res.value!);
+          this.doAddMessage(res.value!);
         }
       },
       error: err => this.toastService.error(err.message)
@@ -80,11 +100,7 @@ export class Chat {
     this.messageService.updateMessage(message).subscribe({
       next: res => {
         if (res.isSuccess){
-          const index = this.messages.findIndex(m => m.id === res.value!.id);
-          if (index > -1) {
-            // Replace the existing message with the updated one
-            this.messages[index] = res.value!;
-          }
+          this.doAddMessage(message);
         }
         else 
           this.toastService.error(res.message)
@@ -94,14 +110,24 @@ export class Chat {
     this.selectedMessage = null;
   }
 
+  doAddMessage(message: MessageModel){
+    const index = this.messages.findIndex(m => m.id === message.id);
+    if (index !== -1) {
+      // message already exists → update it
+      this.messages[index] = message;
+    } else {
+      // new message → push
+      this.messages.push(message);
+    }
+  }
+
   deleteMessage(message: MessageModel){
     if (!this.editContent.trim()) return;
     
     this.messageService.deleteMessage(message.id).subscribe({
       next: res => {
         if (res.isSuccess){
-          this.messages = this.messages
-            .filter(item => item !== message);
+          this.doDeleteMessage(message.id)
         }
         else 
           this.toastService.error(res.message)
@@ -109,6 +135,11 @@ export class Chat {
       error: err => this.toastService.error(err.message)
     });
     this.selectedMessage = null;
+  }
+
+  doDeleteMessage(id: number){
+    this.messages = this.messages
+      .filter(m => m.id !== id);
   }
 
   @HostListener('document:click', ['$event'])

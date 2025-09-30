@@ -1,4 +1,5 @@
-﻿using ChatTool.API.Interfaces;
+﻿using ChatTool.API.Hubs;
+using ChatTool.API.Interfaces;
 using ChatTool.API.Managers;
 using ChatTool.Database;
 using ChatTool.Mapper;
@@ -13,6 +14,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddChatToolServices(this IServiceCollection services, IConfiguration configuration)
     {
+        //endpoint
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
@@ -50,14 +52,16 @@ public static class ServiceCollectionExtensions
             options.AddPolicy("LocalhostOnly", policy =>
             {
                 policy.WithOrigins("http://localhost", "https://localhost")
-                      .AllowAnyHeader()
-                      .AllowAnyMethod();
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials(); ;
                 policy.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
             });
         });
 
+        //mapper
         services.AddAutoMapper(cfg =>
         {
             cfg.AddProfile<UserProfile>();
@@ -65,8 +69,10 @@ public static class ServiceCollectionExtensions
             cfg.AddProfile<MessageProfile>();
         });
 
+        //config
         services.Configure<AppSettings>(configuration);
 
+        //db
         services.AddDbContext<DBContext>(options =>
         {
             //options.UseInMemoryDatabase("ChatToolDB");
@@ -77,6 +83,7 @@ public static class ServiceCollectionExtensions
             options.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
         });
 
+        //managers
         services.AddScoped<ITokenManager, TokenManager>();
         services.AddScoped<IAuthManager, AuthManager>();
         services.AddScoped<IUserManager, UserManager>();
